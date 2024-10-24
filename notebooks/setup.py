@@ -63,7 +63,6 @@ print(f"Endpoint named {vector_search_endpoint} is ready.")
 
 # COMMAND ----------
 
-from databricks.sdk import WorkspaceClient
 import databricks.sdk.service.catalog as c
 
 source_table_fullname = f"{catalog}.{schema}.pdfs"
@@ -92,52 +91,27 @@ print(f"index {vs_index_fullname} on table {source_table_fullname} is ready")
 
 # COMMAND ----------
 
-# Add comments to:
+from databricks.sdk import WorkspaceClient
 
-#{catalog}.{sat_schema}.security_best_practices -> The best practices
-#{catalog}.{sat_schema}.security_analysis_tool.security_checks -> The actual check
+ws = WorkspaceClient()
 
-# COMMAND ----------
+example_queries = read_json_file(json_file="../resources/config.json")["example_queries"]
+for q in example_queries:
 
-# Create example queries...
-#   https://github.com/andyweaves/databricks-notebooks/blob/main/notebooks/security_genie/example_sql_queries.sql
+    ws.queries.create(name=q["name"], query=q["query"].format(catalog=catalog, schema=get_schema(q["type"])))
 
-# COMMAND ----------
+vs_query = f"SELECT ai_query('databricks-meta-llama-3-1-70b-instruct', concat('Given the information provided, please answer the following question: ', :question, ' information: ', (SELECT FIRST(text) FROM VECTOR_SEARCH(index => '{vs_index_fullname}', query => :question, num_results => 1)))) AS answer, FIRST(file_name) AS answer_source FROM VECTOR_SEARCH(index => '{vs_index_fullname}', query => :question, num_results => 1)" 
 
-# Create Pandas UDFs...
-#   https://github.com/andyweaves/databricks-notebooks/blob/main/notebooks/security_genie/check_ip_acls_against_system_tables.py
+ws.queries.create(name="Search the Databricks Security & Trust Center content", query=vs_query)
 
 # COMMAND ----------
 
-import os
-import concurrent.futures
-
-# with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-
-#   futures = []
-#   for table in tables:
-#       futures.append(executor.submit(grant_privilege_to_securable, "SELECT", f"{uc_catalog}.{uc_schema}.{table}", principal))
-#   for future in concurrent.futures.as_completed(futures):
-#       print(future.result())
+comments = read_json_file(json_file="../resources/config.json")["comments"]
+for c in comments:
+    comment = c['comment']
+    sql_command = f"COMMENT ON TABLE {c['table'].format(catalog=catalog, schema=get_schema(c['type']))} IS '{comment}'"
+    spark.sql(sql_command)
 
 # COMMAND ----------
 
-# import os
-# import concurrent.futures
-
-# with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-
-#   futures = [executor.submit(pii_scanner.scan_and_tag_securable, f"{securable.table_catalog}.{securable.table_schema}.{securable.table_name}", securable.table_type) for securable in all_tables.collect()]
-  
-#   for future in concurrent.futures.as_completed(futures):
-
-#     result = future.result()
-#     if isinstance(result, pd.DataFrame):
-#       scan_results = pd.concat([scan_results, result])
-#     else:
-#       print(result)
-
-# COMMAND ----------
-
-comments = read_json_file(json_file="../resources/comments.json")["tables"]
-comments
+# Create IP checks!

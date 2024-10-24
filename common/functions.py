@@ -134,3 +134,7 @@ def read_json_file(json_file: str) -> dict:
   with open(json_file) as f:
     d = json.load(f)
     return d
+
+# COMMAND ----------
+
+get_schema = lambda x: sat_schema if x == "sat" else schema
