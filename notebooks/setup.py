@@ -350,18 +350,27 @@ ORDER BY
 
 # COMMAND ----------
 
-print(f"""CREATE OR REPLACE FUNCTION {catalog}.{schema}.search_trust_center_content(question STRING COMMENT 'The question to ask')
-    RETURNS TABLE
-    COMMENT 'A trusted asset that can be used to search for content from the Databricks Security & Trust Center and then use an LLM to summarize the results.'
-    RETURN (WITH vs AS (SELECT text, file_name FROM VECTOR_SEARCH(
-    index => '{catalog}.{schema}.trust_center_content_vs', 
-    query => question, 
-    num_results => 1))
+statement = f"""CREATE OR REPLACE FUNCTION {catalog}.{schema}.search_trust_center_content(question STRING COMMENT 'The question to ask')
+RETURNS TABLE
+COMMENT 'A trusted asset that can be used to search for content from the Databricks Security & Trust Center and then use an LLM to summarize the results.'
+RETURN (WITH vs AS (SELECT text, file_name FROM VECTOR_SEARCH(
+index => '{catalog}.{schema}.trust_center_content_vs', 
+query => question, 
+num_results => 1))
 
-    SELECT ai_query(
-      endpoint => 'databricks-meta-llama-3-1-70b-instruct', 
-      request => concat('Given the following information, please answer the following question: ', question, ' information: ', (SELECT text FROM vs))) AS answer, (SELECT file_name FROM vs) AS answer_source);
-    """)
+SELECT ai_query(
+    endpoint => 'databricks-meta-llama-3-1-70b-instruct', 
+    request => concat('Given the following information, please answer the following question: ', question, ' information: ', (SELECT text FROM vs))) AS answer, (SELECT file_name FROM vs) AS answer_source);
+    """
+
+# COMMAND ----------
+
+from databricks.sdk import WorkspaceClient
+
+ws = WorkspaceClient()
+
+wh = ws.warehouses.list()[0]
+ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id)
 
 # COMMAND ----------
 
