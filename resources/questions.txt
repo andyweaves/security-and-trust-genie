@@ -1,15 +1,15 @@
 What security best practices should I follow for Databricks?
-How do my workspaces compare against security best practices?
-Can you give me a summary of all the security best practices for Databricks?
-How secure is my Databricks account? 
-Has anyone from Databricks logged into my workspaces recently?
-Can Databricks login to my workspaces?
-Has there been any suspicious activity in my account recently?
-Have there been any failed authentication attempts recently?
-Have there been any failed authorization attempts recently?
-Have there been any attempts to access my Databricks account from untrusted networks recently?
-Has anyone tried to repeatedly access secrets within my Databricks workspaces recently?
-How can I protect against model supply chain attacks?
-How can I protect against ransomware attacks?
-How can I protect against data exfiltration?
-What is the shared responsibility model for Databricks?
+How does my account compare against security best practices? 
+Which security best practices am I following?
+How can I improve my security posture?
+Which security best practices should I implement next?
+Have there been any failed authentication attempts?
+Is anyone trying to hack or brute force access to my Databricks account?
+Have there been any failed authorization attempts?
+Is anyone trying to elevate their privileges within my Databricks account?
+Has anyone tried to access my Databricks account from an untrusted network?
+Is anyone trying to hack into my Databricks account?
+Is anyone trying to repeatedly access secrets within my Databricks account?
+Are there any signs of credential theft?
+Has anyone from Databricks logged into my account recently?
+Is it possible for Databricks to log in to my account?
