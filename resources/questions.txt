@@ -13,3 +13,10 @@ Is anyone trying to repeatedly access secrets within my Databricks account?
 Are there any signs of credential theft?
 Has anyone from Databricks logged into my account recently?
 Is it possible for Databricks to log in to my account?
+What is the shared responsibility model for Databricks on AWS?
+What is the shared responsibility model for Databricks on Azure?
+What is the shared responsibility model for Databricks on GCP?
+What are some emerging AI security threats that I should be aware of?
+How can I protect against model supply chain attacks?
+How can I protect against data exfiltration on AWS?
+How can I protect against ransomware attacks on GCP?

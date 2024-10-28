@@ -350,6 +350,8 @@ ORDER BY
 
 # COMMAND ----------
 
+# Because it uses ai_query this create function statement can only run on a SQL warehouse
+
 statement = f"""CREATE OR REPLACE FUNCTION {catalog}.{schema}.search_trust_center_content(question STRING COMMENT 'The question to ask')
 RETURNS TABLE
 COMMENT 'A trusted asset that can be used to search for content from the Databricks Security & Trust Center and then use an LLM to summarize the results.'
@@ -412,7 +414,7 @@ ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id
 # from databricks.sdk import WorkspaceClient
 # from pyspark.sql.functions import explode, expr
 
-# # this only gets IP ACLs for the current workspace...
+# # This only gets IP ACLs for the current workspace...
 # ws = WorkspaceClient()
 # ws_ips = [ip_acl for ip_acl in ws.ip_access_lists.list() if ip_acl.enabled and ip_acl.list_type.value == "ALLOW"]
 
@@ -422,7 +424,10 @@ ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id
 # )
 
 # df = (spark.createDataFrame(data, ["name", "cidrs"])
-#       .select("name", explode("cidrs").alias("cidr"), expr("ipv4_cidr_to_range(cidr)").alias("cird_range")))
+#       .select(
+#         "name", 
+#         explode("cidrs").alias("cidr"), 
+#         expr("ipv4_cidr_to_range(cidr)").alias("cird_range")))
 # display(df)
 
 # COMMAND ----------
@@ -437,7 +442,7 @@ ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id
 
 # COMMAND ----------
 
-#df.write.mode("overwrite").insertInto(f"{catalog}.{schema}.trusted_ip_addresses")
+# df.write.mode("overwrite").insertInto(f"{catalog}.{schema}.trusted_ip_addresses")
 
 # COMMAND ----------
 
