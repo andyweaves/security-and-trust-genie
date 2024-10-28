@@ -5,7 +5,7 @@ Welcome to [Security & Trust](https://www.databricks.com/trust) Genie: your AI-p
 > [!WARNING] 
 > This is not an officially-endorsed Databricks product or solution, use at your own risk!
 
-###Setup
+## Setup
 
 * **Step 1:** Choose a workspace in which to run the Security & Trust Genie 
 * **Step 2:** Ensure that you have system tables ([AWS](https://docs.databricks.com/en/admin/system-tables/index.html), [Azure](https://learn.microsoft.com/en-us/azure/databricks/admin/system-tables/), [GCP](https://docs.gcp.databricks.com/en/admin/system-tables/index.html)) enabled 
