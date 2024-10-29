@@ -37,6 +37,6 @@ Welcome to the Databricks [Security & Trust](https://www.databricks.com/trust) G
 
 | Question      | Answer | Screenshot    |
 | :---        |    :----:   |          ---: |
-| What is the shared responsibility model for Databricks on AWS?      | The shared responsibility model for Databricks on AWS is a collaborative effort between Databricks, the customer, and AWS... (summarized content from [databricks-shared-responsibility-model-aws.pdf](https://www.databricks.com/sites/default/files/2023-08/databricks-shared-responsibility-model-gcp.pdf)      | ![image](https://github.com/user-attachments/assets/c006a3df-c897-4598-a363-c69efbbd4ea2) |
+| What is the shared responsibility model for Databricks on AWS?      | The shared responsibility model for Databricks on AWS is a collaborative effort between Databricks, the customer, and AWS... (summarized content from [databricks-shared-responsibility-model-aws.pdf](https://www.databricks.com/trust/security-features#documentation))      | ![image](https://github.com/user-attachments/assets/c006a3df-c897-4598-a363-c69efbbd4ea2) |
 | Are there any IoCs (Indicators of Compromise in my account?)   | To identify indicators of compromise (IoCs), I would need more specific information about what types of events or patterns you are concerned about. For example, are you looking for multiple failed login attempts, unusual access times, or access from unfamiliar IP addresses?        | ![image](https://github.com/user-attachments/assets/59faaa96-6ac5-4a1c-923f-80c5af7568cd)     |
 
