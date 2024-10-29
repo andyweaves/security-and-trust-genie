@@ -35,7 +35,8 @@ Welcome to the Databricks [Security & Trust](https://www.databricks.com/trust) G
 
 ## Examples
 
-#### What is the shared responsibility model for Databricks on AWS?
+| Question      | Answer | Screenshot    |
+| :---        |    :----:   |          ---: |
+| What is the shared responsibility model for Databricks on AWS?      | Title       | Here's this   |
+| Are there any IoCs (Indicators of Compromise in my account?)   | Text        | ![image](https://github.com/user-attachments/assets/59faaa96-6ac5-4a1c-923f-80c5af7568cd)     |
 
-#### Are there any IoCs (Indicators of Compromise in my account?)
-![image](https://github.com/user-attachments/assets/59faaa96-6ac5-4a1c-923f-80c5af7568cd)
