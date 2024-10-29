@@ -28,10 +28,8 @@ Welcome to the Databricks [Security & Trust](https://www.databricks.com/trust) G
 * **Step 8:** Create a new Genie Space ([AWS](https://docs.databricks.com/en/genie/index.html#create-a-new-genie-space), [Azure](https://learn.microsoft.com/en-us/azure/databricks/genie/#create-a-new-genie-space), [GCP](https://docs.gcp.databricks.com/en/genie/index.html#create-a-new-genie-space)):
     * _Copy and paste the [instructions.txt](resources/instructions.txt) into the General Instructions field_
     * _Select the SQL functions created automatically by the [setup.py](notebooks/setup.py) notebook via the Add SQL Functions button_
-
-## Make a wish!
-
-* You can find some examples of the kinds of questions you can ask in the [questions.txt](resources/questions.txt) file provided!
+*  **Step 9:** Make a wish!
+   * _You can find some examples of the kinds of questions you can ask in the [questions.txt](resources/questions.txt) file provided!_
 
 ## Examples
 
