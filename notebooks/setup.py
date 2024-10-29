@@ -384,65 +384,70 @@ ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC -- CREATE OR REPLACE FUNCTION IDENTIFIER(:catalog || '.' || :schema || '.ipv4_to_long')(ip STRING COMMENT 'The IPv4 address to convert')
-# MAGIC -- RETURNS LONG
-# MAGIC -- COMMENT 'Converts an IPv4 address to a LONG for faster lookup/searching'
-# MAGIC -- RETURN
-# MAGIC --   CASE
-# MAGIC --     WHEN regexp_count(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+") <> 1 THEN NULL
-# MAGIC --     ELSE 
-# MAGIC --       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[3]), 256) +
-# MAGIC --       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[2]), 256) * 256 +
-# MAGIC --       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[1]), 256) * 65536 +
-# MAGIC --       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[0]), 256) * 16777216
-# MAGIC --   END;
+# MAGIC CREATE OR REPLACE FUNCTION IDENTIFIER(:catalog || '.' || :schema || '._ipv4_to_long')(ip STRING COMMENT 'The IPv4 address to convert')
+# MAGIC RETURNS LONG
+# MAGIC COMMENT 'Converts an IPv4 address to a LONG for faster lookup/searching'
+# MAGIC RETURN
+# MAGIC   CASE
+# MAGIC     WHEN regexp_count(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+") <> 1 THEN NULL
+# MAGIC     ELSE 
+# MAGIC       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[3]), 256) +
+# MAGIC       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[2]), 256) * 256 +
+# MAGIC       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[1]), 256) * 65536 +
+# MAGIC       mod(BIGINT(split(regexp_extract(ip, "\\d+\\.\\d+\\.\\d+\\.\\d+", 0), "\\.")[0]), 256) * 16777216
+# MAGIC   END;
 
 # COMMAND ----------
 
-# sql(f"USE CATALOG {catalog}")
-# sql(f"USE SCHEMA {schema}")
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC -- CREATE OR REPLACE FUNCTION IDENTIFIER(:catalog || '.' || :schema || '.ipv4_cidr_to_range')(cidr STRING)
-# MAGIC -- RETURNS ARRAY<BIGINT>
-# MAGIC -- RETURN ARRAY(ipv4_to_long(split(cidr, "/")[0]), ipv4_to_long(split(cidr, "/")[0]) + power(2, 32-int(split(cidr, "/")[1]))-1)
-
-# COMMAND ----------
-
-# from databricks.sdk import WorkspaceClient
-# from pyspark.sql.functions import explode, expr
-
-# # This only gets IP ACLs for the current workspace...
-# ws = WorkspaceClient()
-# ws_ips = [ip_acl for ip_acl in ws.ip_access_lists.list() if ip_acl.enabled and ip_acl.list_type.value == "ALLOW"]
-
-# data = [(ip_acl.label, ip_acl.ip_addresses) for ip_acl in ws_ips]
-# data.append( # add private IPs to filter out internal traffic
-#     ("private IPs", list(["192.168.0.0/16", "10.0.0.0/8", "72.16.0.0/12"]))
-# )
-
-# df = (spark.createDataFrame(data, ["name", "cidrs"])
-#       .select(
-#         "name", 
-#         explode("cidrs").alias("cidr"), 
-#         expr("ipv4_cidr_to_range(cidr)").alias("cird_range")))
-# display(df)
+sql(f"USE CATALOG {catalog}")
+sql(f"USE SCHEMA {schema}")
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC -- CREATE OR REPLACE TABLE IDENTIFIER(:catalog || '.' || :schema || '.trusted_ip_addresses')(
-# MAGIC --   name STRING,
-# MAGIC --   cidr STRING,
-# MAGIC --   cidr_range ARRAY<BIGINT>
-# MAGIC -- )
-# MAGIC -- COMMENT 'The `trusted_ip_addresses` table contains a list of IP addresses that are allowed to access your account and workspaces. `private IPs` are automatically considered trusted here in order to filter out internal compute plane traffic. It includes the name, its CIDR notation, and an array of the CIDR range start and end values an ARRAY<LONG> for faster lookups/searching. The data can be used to monitor the list of trusted IP addresses.'
+# MAGIC CREATE OR REPLACE FUNCTION IDENTIFIER(:catalog || '.' || :schema || '._ipv4_cidr_to_range')(cidr STRING)
+# MAGIC RETURNS ARRAY<BIGINT>
+# MAGIC RETURN ARRAY(_ipv4_to_long(split(cidr, "/")[0]), _ipv4_to_long(split(cidr, "/")[0]) + power(2, 32-int(split(cidr, "/")[1]))-1)
 
 # COMMAND ----------
 
-# df.write.mode("overwrite").insertInto(f"{catalog}.{schema}.trusted_ip_addresses")
+from databricks.sdk import WorkspaceClient
+from pyspark.sql.functions import explode, expr
+
+# This only gets IP ACLs for the current workspace...
+ws = WorkspaceClient()
+ws_ips = [ip_acl for ip_acl in ws.ip_access_lists.list() if ip_acl.enabled and ip_acl.list_type.value == "ALLOW"]
+
+data = [(ip_acl.label, ip_acl.ip_addresses) for ip_acl in ws_ips]
+data.append( # add private IPs to filter out internal traffic
+    ("private IPs", list(["192.168.0.0/16", "10.0.0.0/8", "72.16.0.0/12"]))
+)
+
+df = (spark.createDataFrame(data, ["name", "cidrs"])
+      .select(
+        "name", 
+        explode("cidrs").alias("cidr"), 
+        expr("_ipv4_cidr_to_range(cidr)").alias("cird_range")))
+display(df)
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE TABLE IDENTIFIER(:catalog || '.' || :schema || '.trusted_ip_addresses')(
+# MAGIC   name STRING,
+# MAGIC   cidr STRING,
+# MAGIC   cidr_range ARRAY<BIGINT>
+# MAGIC )
+# MAGIC COMMENT 'The `trusted_ip_addresses` table contains a list of IP addresses that are allowed to access your account and workspaces. `private IPs` are automatically considered trusted here in order to filter out internal compute plane traffic. It includes the name, its CIDR notation, and an array of the CIDR range start and end values an ARRAY<LONG> for faster lookups/searching. The data can be used to monitor the list of trusted IP addresses.'
+
+# COMMAND ----------
+
+df.write.mode("overwrite").insertInto(f"{catalog}.{schema}.trusted_ip_addresses")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT * FROM trusted_ip_addresses
 
 # COMMAND ----------
 
@@ -464,7 +469,7 @@ ws.statement_execution.execute_statement(statement=statement, warehouse_id=wh.id
 # MAGIC --   count(1) AS attempts, 
 # MAGIC --   count(1) FILTER (WHERE response.status_code = 200) successful_attempts
 # MAGIC --   FROM system.access.audit LEFT ANTI JOIN trusted_ip_addresses 
-# MAGIC --   ON ipv4_to_long(source_ip_address) BETWEEN cidr_range[0] AND cidr_range[1]
+# MAGIC --   ON _ipv4_to_long(source_ip_address) BETWEEN cidr_range[0] AND cidr_range[1]
 # MAGIC --   WHERE event_date >= DATE_ADD((SELECT MAX(event_date) FROM system.access.audit), - num_days)
 # MAGIC --   AND source_ip_address IS NOT NULL
 # MAGIC --   AND source_ip_address NOT IN ('127.0.0.1', '0.0.0.0', '0:0:0:0:0:0:0:1%0', '')
